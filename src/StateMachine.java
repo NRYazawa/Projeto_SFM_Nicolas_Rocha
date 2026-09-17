@@ -53,7 +53,7 @@ public class StateMachine {
                 case COMENDO:
                     if (juca.getHunger() <= 0) {
                         juca.setHunger(0);
-                        System.out.println("ufa! já estou cheio..."); // <--- FALA DE SAÍDA
+                        System.out.println("ufa! já estou cheio...");
                         System.out.println("preciso trabalhar...");
                         estadoJuca = Estado.TRABALHANDO;
                     }
