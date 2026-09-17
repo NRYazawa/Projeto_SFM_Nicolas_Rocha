@@ -2,60 +2,97 @@ public class StateMachine {
     enum Estado {
         TRABALHANDO,
         DESCANSANDO,
-        COMENDO
+        COMENDO,
+        COZINHANDO,
+        LIMPANDO
     }
 
     public static void main(String[] args) {
         Juca juca = new Juca();
-        Estado estado = Estado.TRABALHANDO;
+        Bob bob = new Bob();
+
+        Estado estadoJuca = Estado.TRABALHANDO;
+        Estado estadoBob = Estado.COZINHANDO;
 
         while (true) {
-            switch (estado) {
-                case TRABALHANDO:
-                    juca.trabalhar();
 
-                    if (juca.getHunger() < 10 && juca.getFatigue() < 50) {
-                        estado = Estado.TRABALHANDO;
-                    } else if (juca.getFatigue() >= 50 && juca.getHunger() <= 10) {
+            System.out.println("=== JUCA ===");
+
+            switch (estadoJuca) {
+                case TRABALHANDO: juca.trabalhar(); break;
+                case DESCANSANDO: juca.descansar(); break;
+                case COMENDO: juca.comer(); break;
+            }
+
+            juca.printInfoJuca();
+
+            switch (estadoJuca) {
+                case TRABALHANDO:
+                    if (juca.getFatigue() > 50) {
                         System.out.println("ai que soninho...");
-                        estado = Estado.DESCANSANDO;
-                    } else if (juca.getFatigue() < 50 && juca.getHunger() >= 10) {
+                        estadoJuca = Estado.DESCANSANDO;
+                    } else if (juca.getHunger() > 10) {
                         System.out.println("ai que fominha...");
-                        estado = Estado.COMENDO;
+                        estadoJuca = Estado.COMENDO;
                     }
                     break;
 
                 case DESCANSANDO:
-                    juca.descansar();
-
-                    if (juca.getFatigue() > 0) {
-                        estado = Estado.DESCANSANDO;
-                    } else if (juca.getFatigue() <= 0 && juca.getHunger() <= 10) {
-                        System.out.println("preciso trabalhar...");
-                        estado = Estado.TRABALHANDO;
-                    } else if (juca.getFatigue() <= 0 && juca.getHunger() > 10) {
-                        System.out.println("ai que fominha...");
-                        estado = Estado.COMENDO;
+                    if (juca.getFatigue() <= 0) {
+                        juca.setFatigue(0);
+                        if (juca.getHunger() <= 10) {
+                            System.out.println("preciso trabalhar...");
+                            estadoJuca = Estado.TRABALHANDO;
+                        } else {
+                            System.out.println("ai que fominha...");
+                            estadoJuca = Estado.COMENDO;
+                        }
                     }
                     break;
 
                 case COMENDO:
-                    juca.comer();
-
-                    if (juca.getHunger() > 0) {
-                        estado = Estado.COMENDO;
-                    } else if (juca.getFatigue() <= 50 && juca.getHunger() <= 0) {
+                    if (juca.getHunger() <= 0) {
+                        juca.setHunger(0);
+                        System.out.println("ufa! já estou cheio..."); // <--- FALA DE SAÍDA
                         System.out.println("preciso trabalhar...");
-                        estado = Estado.TRABALHANDO;
-                    } else if (juca.getFatigue() >= 50 && juca.getHunger() <= 0) {
-                        System.out.println("ai que soninho...");
-                        estado = Estado.DESCANSANDO;
+                        estadoJuca = Estado.TRABALHANDO;
                     }
                     break;
             }
 
-            juca.printInfo();
-            System.out.println("\n--------------------------\n");
+            System.out.println();
+
+            System.out.println("=== BOB ===");
+
+            switch (estadoBob) {
+                case COZINHANDO: bob.cozinhar(); break;
+                case LIMPANDO: bob.limpar(); break;
+            }
+
+            bob.printInfoBob();
+
+            switch (estadoBob) {
+                case COZINHANDO:
+                    if (bob.getCookingProgress() >= 12) {
+                        bob.setCookingProgress(12);
+                        System.out.println("a comida está pronta!");
+                        System.out.println("ai que bagunça...");
+                        estadoBob = Estado.LIMPANDO;
+                    }
+                    break;
+
+                case LIMPANDO:
+                    if (bob.getMess() <= 0) {
+                        bob.setMess(0);
+                        bob.setCookingProgress(0);
+                        System.out.println("tudo limpo!");
+                        System.out.println("preciso cozinhar...");
+                        estadoBob = Estado.COZINHANDO;
+                    }
+                    break;
+            }
+
+            System.out.println("\n----------------------------------------\n");
 
             try {
                 Thread.sleep(1000);
